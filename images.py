@@ -3,6 +3,8 @@ import os
 from random import shuffle
 from shutil import copy, move
 
+# Copy images from dataset to intermediate folder to perform Data Augmentation
+
 def extract(dest):
     src = r'E:\SkinCancerDetection\PH2Dataset\PH2 Dataset images'
     list_src = os.listdir(src)
@@ -10,7 +12,9 @@ def extract(dest):
     for i in range(len_src):
         copy(src + '\\' + list_src[i] + '\\' + list_src[i] + '_Dermoscopic_Image\\' + list_src[i] + '.bmp', dest)
         print(i + 1, 'of', len_src)
-        
+
+
+# Separate data into Malignant and Benign data points
 def divide(src, dest, malignant_src):
     combo = os.listdir(src)
     malignant = os.listdir(malignant_src)
@@ -19,14 +23,16 @@ def divide(src, dest, malignant_src):
         if combo[i] in malignant:
             move(src + '\\' + combo[i], dest)
         print(i, 'of', len_combo)
-    
+
+# Perform cropping on image data
 def all_crops(src, dest):
     crop_images(src, dest, mode = 'center', size = 448)
     crop_images(src, dest, mode = 'top-left', size = 224)
     crop_images(src, dest, mode = 'top-right', size = 224)
     crop_images(src, dest, mode = 'bottom-right', size = 224)
     crop_images(src, dest, mode = 'bottom-left', size = 224)
-    
+
+# Perform the given type of crop on all images in a source file
 def crop_images(src, dest, mode = 'center', size = None):
     list_of_images = os.listdir(src)
     total_data_size = len(list_of_images)
@@ -40,6 +46,7 @@ def crop_images(src, dest, mode = 'center', size = None):
             print(e)
     print('Copied everything from', src, 'to', dest)
 
+# Perform the given type of crop on one image in a source file
 def crop_img(imgsrc, imgdest, mode = 'center', size = None):
     im = Image.open(imgsrc)
     width, height = im.size
@@ -77,7 +84,8 @@ def crop_img(imgsrc, imgdest, mode = 'center', size = None):
         
     im = im.crop((left, top, right, bottom))
     im.save(imgdest)    
-    
+  
+# Separate all data points into train/test/validation datasets
 def train_valid_test_split(src, train_dest, valid_dest, test_dest, dir_name):
     list_of_images = os.listdir(src)
     shuffle(list_of_images)
@@ -95,6 +103,7 @@ def train_valid_test_split(src, train_dest, valid_dest, test_dest, dir_name):
         print(i + 1, 'of', total_data_size, 'copied')
     print('Split completed from', src)
 
+# Move cropped image into the main source file for dataset with appropriate file name
 def moving_cropped(src, dest):
     main_dir = os.listdir(src)
     actual_dir = None
